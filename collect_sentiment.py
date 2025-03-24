@@ -1,4 +1,4 @@
-# collect_sentiment.py
+# collect_sentiment.py (version log + compteur)
 
 import requests
 from bs4 import BeautifulSoup
@@ -6,23 +6,19 @@ import pandas as pd
 from datetime import datetime
 import os
 
-# === CONFIG ===
 MAJORS = ["EUR", "GBP", "USD", "AUD", "NZD", "CAD", "CHF", "JPY"]
 ALLOWED_PAIRS = [a + b for a in MAJORS for b in MAJORS if a != b]
 DATA_DIR = "data"
 
-# === Scraper Myfxbook ===
 def get_sentiment_from_myfxbook():
     url = "https://www.myfxbook.com/community/outlook"
     headers = {"User-Agent": "Mozilla/5.0"}
     response = requests.get(url, headers=headers)
-
     soup = BeautifulSoup(response.text, 'html.parser')
     table = soup.find("table", {"id": "outlookSymbolsTable"})
     rows = table.find("tbody").find_all("tr")
 
     data = []
-
     for row in rows:
         try:
             cols = row.find_all("td")
@@ -49,12 +45,12 @@ def get_sentiment_from_myfxbook():
 
     return data
 
-# === Enregistre dans un CSV par paire ===
 def save_data_to_csv(data):
     now = datetime.now().replace(minute=0, second=0, microsecond=0)
     now_str = now.strftime("%Y-%m-%d %H:%M")
-
     os.makedirs(DATA_DIR, exist_ok=True)
+
+    new_entries = 0
 
     for item in data:
         pair = item["pair"]
@@ -65,8 +61,9 @@ def save_data_to_csv(data):
         except FileNotFoundError:
             df = pd.DataFrame(columns=["timestamp", "pair", "long_pct", "short_pct"])
 
-        # Vérifie s’il y a déjà une ligne pour cette heure
-        if not ((df["timestamp"] == now_str) & (df["pair"] == pair)).any():
+        already_exists = ((df["timestamp"] == now_str) & (df["pair"] == pair)).any()
+
+        if not already_exists:
             new_row = pd.DataFrame([{
                 "timestamp": now_str,
                 "pair": pair,
@@ -75,9 +72,14 @@ def save_data_to_csv(data):
             }])
             df = pd.concat([df, new_row], ignore_index=True)
             df.to_csv(file_path, index=False)
+            new_entries += 1
+
+    print(f"✅ {new_entries} nouvelles lignes ajoutées.")
+    if new_entries == 0:
+        print("ℹ️ Aucune nouvelle donnée à enregistrer. Tout est déjà à jour.")
 
 if __name__ == "__main__":
     print("⏳ Scraping MyFXBook...")
     sentiment_data = get_sentiment_from_myfxbook()
     save_data_to_csv(sentiment_data)
-    print("✅ Données mises à jour.")
+    print("✅ Script terminé.")
