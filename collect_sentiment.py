@@ -83,3 +83,4 @@ if __name__ == "__main__":
     sentiment_data = get_sentiment_from_myfxbook()
     save_data_to_csv(sentiment_data)
     print("✅ Script terminé.")
+
