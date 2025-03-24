@@ -23,7 +23,7 @@ jobs:
 
       # 3. 📦 Installer les dépendances
       - name: 📦 Installer les dépendances
-        run: pip install -r requirements.txt
+        run: pip install requests beautifulsoup4 pandas
 
       # 4. 🚀 Lancer le script Python
       - name: 🚀 Lancer le script
