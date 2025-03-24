@@ -1,36 +1,42 @@
-name: Collect MyFXBook Sentiment
+name: 🧠 Collect MyFXBook Sentiment
 
 on:
   schedule:
-    - cron: "0 * * * *"  # ⏰ Exécute toutes les heures (UTC)
-  workflow_dispatch:     # Permet de le lancer manuellement
+    # Tous les jours à chaque heure pile
+    - cron: '0 * * * *'
+  workflow_dispatch:  # Permet de le lancer manuellement aussi via GitHub UI
 
 jobs:
   collect-sentiment:
     runs-on: ubuntu-latest
 
     steps:
+      # 1. 🔽 Récupère le repo
       - name: 📥 Checkout repo
         uses: actions/checkout@v3
 
-      - name: 📦 Setup Python
+      # 2. 🐍 Setup Python
+      - name: 🐍 Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
 
+      # 3. 📦 Installer les dépendances
       - name: 📦 Installer les dépendances
-        run: |
-          python -m pip install --upgrade pip
-          pip install requests beautifulsoup4 pandas
+        run: pip install -r requirements.txt
 
+      # 4. 🚀 Lancer le script Python
       - name: 🚀 Lancer le script
-        run: |
-          python collect_sentiment.py
+        run: python collect_sentiment.py
 
-      - name: 💾 Commit des nouveaux CSV
+      # 5. ✅ Commit des CSV modifiés (si besoin)
+      - name: 📤 Commit des nouveaux CSV
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git add data/*.csv || true
-          git commit -m "Update sentiment data [bot]" || echo "No changes"
-          git push || echo "Nothing to push"
+          git add data/*.csv
+
+          # Ajoute un timestamp dans le message
+          TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M UTC")
+          git commit -m "📈 Update sentiment data — $TIMESTAMP" || echo "ℹ️ Rien à commit"
+          git push
