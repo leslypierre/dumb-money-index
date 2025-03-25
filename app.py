@@ -118,14 +118,21 @@ with col2:
     # Longs en positif
     fig.add_trace(go.Bar(
         x=df_plot["label"],
-        y=df_plot["long_pct"],
-        name="Long",
-        marker_color="#00c49f",
-        hovertemplate="%{x}<br>%{y}% Long<extra></extra>"
+        y=-df_plot["short_pct"],
+        name="Short",
+        marker_color="#ff595e",
+        hovertemplate="%{x}<br>%{y}% Short<extra></extra>",
+        width=0.5
     ))
 
     fig.update_layout(
-        xaxis=dict(type='category'),  # ✅ obligatoire pour comportement "fixe"
+        xaxis=dict(
+            type='category',  # Obligatoire pour traiter les labels comme des catégories
+            tickmode='array',
+            tickvals=df_plot["label"],
+            ticktext=df_plot["label"],
+            tickangle=45  # Incline un peu pour éviter chevauchement
+        ),
         shapes=[
             dict(
                 type="line",
@@ -139,14 +146,18 @@ with col2:
             )
         ],
         barmode='relative',
-        bargap=0.05,  # 🧱 espace entre les barres (0 = collées)
-        bargroupgap=0,  # 👥 pas d'espace entre groupes
+        bargap=0.05,  # Ajuste l'espacement entre les barres
+        bargroupgap=0.0,  # Aucun espace entre les groupes de barres
         plot_bgcolor="#0e1117",
         paper_bgcolor="#0e1117",
         font=dict(color='white'),
         margin=dict(l=10, r=10, t=30, b=60),
         height=300,
-        legend=dict(bgcolor="#1a1c23", bordercolor="white", borderwidth=1)
+        legend=dict(
+            bgcolor="#1a1c23",
+            bordercolor="white",
+            borderwidth=1
+        )
     )
 
     st.markdown(f"""
