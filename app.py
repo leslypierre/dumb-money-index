@@ -74,8 +74,8 @@ with col1:
 
     donut_fig.update_layout(
         showlegend=False,
-        width=300,  # ✅ diamètre ajusté
-        height=300,
+        width=200,  # ✅ diamètre ajusté
+        height=200,
         margin=dict(t=10, b=10, l=10, r=10),
         paper_bgcolor="#0e1117",  # même fond que le reste
         plot_bgcolor="#0e1117"
