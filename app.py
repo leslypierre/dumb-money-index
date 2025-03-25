@@ -41,10 +41,10 @@ if not pairs:
     st.stop()
 
 selected_pair = st.selectbox("Choisir une paire :", pairs)
-file_path = os.path.join(DATA_DIR, f"{selected_pair}_sentiment.csv")
+csv_url = f"https://raw.githubusercontent.com/leslypierre/dumb-money-index/main/data/{selected_pair}_sentiment.csv"
 
 try:
-    df = pd.read_csv(file_path)
+    df = pd.read_csv(csv_url)
 except FileNotFoundError:
     st.warning("Aucune donnée trouvée pour cette paire.")
     st.stop()
