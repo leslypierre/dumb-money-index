@@ -67,19 +67,18 @@ with col1:
         labels=["Long", "Short"],
         values=[long_pct, short_pct],
         hole=0.6,
-        marker=dict(colors=["#00c49f", "#ff004d"]),
-        textinfo="label+percent",
-        insidetextorientation='auto',
-        hoverinfo="label+percent"
+        marker=dict(colors=["#00c49f", "#ff595e"]),
+        textinfo='label+percent',
+        textfont=dict(color='white')  # ✅ texte blanc
     )])
 
     donut_fig.update_layout(
         showlegend=False,
-        margin=dict(t=20, b=20, l=10, r=10),
-        paper_bgcolor="#0e1117",
-        plot_bgcolor="#0e1117",
-        font=dict(color="white"),
-        height=300
+        width=300,  # ✅ diamètre ajusté
+        height=300,
+        margin=dict(t=10, b=10, l=10, r=10),
+        paper_bgcolor="#0e1117",  # même fond que le reste
+        plot_bgcolor="#0e1117"
     )
 
     st.markdown(f"""
