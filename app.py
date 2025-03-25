@@ -19,7 +19,7 @@ plt.rcParams['legend.labelcolor'] = 'white'
 DATA_DIR = "data_sentiment"
 
 # 🖥️ Setup Streamlit
-st.set_page_config(page_title="Dumb Money Index [DXM]", layout="wide")
+st.set_page_config(page_title="[DXM]", layout="wide")
 st.markdown("""
 <h1 style='text-align: center;'>
     <span style='color: white;'>Dumb Money Index </span>
@@ -27,23 +27,21 @@ st.markdown("""
 </h1>
 """, unsafe_allow_html=True)
 
-# 📌 Charger la liste des paires dispo (fichiers CSV)
-if not os.path.exists(DATA_DIR):
-    st.error("Le dossier 'data/' n'existe pas. Lance le script collect_sentiment.py d'abord.")
-    st.stop()
-
-csv_files = [f for f in os.listdir(DATA_DIR) if f.endswith("_sentiment.csv")]
-pairs = sorted([f.replace("_sentiment.csv", "") for f in csv_files])
-
-if not pairs:
-    st.warning("Aucune paire disponible. Attends que les données soient collectées.")
-    st.stop()
+PAIRS = [
+    "AUDCAD", "AUDCHF", "AUDJPY", "AUDNZD", "AUDUSD",
+    "CADCHF", "CADJPY", "CHFJPY",
+    "EURAUD", "EURCAD", "EURCHF", "EURGBP", "EURJPY", "EURNZD", "EURUSD",
+    "GBPAUD", "GBPCAD", "GBPCHF", "GBPJPY", "GBPNZD", "GBPUSD",
+    "NZDCAD", "NZDCHF", "NZDJPY", "NZDUSD",
+    "USDCAD", "USDCHF", "USDJPY"
+]
+pairs = sorted(PAIRS)
 
 selected_pair = st.selectbox("Choisir une paire :", pairs)
-csv_path = os.path.join(DATA_DIR, f"{selected_pair}_sentiment.csv")
+csv_url = f"https://raw.githubusercontent.com/leslypierre/dumb-money-index/main/data_sentiment/{selected_pair}_sentiment.csv"
 
 try:
-    df = pd.read_csv(csv_path)
+    df = pd.read_csv(csv_url)
 except FileNotFoundError:
     st.warning("Aucune donnée trouvée pour cette paire.")
     st.stop()
