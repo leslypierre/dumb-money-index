@@ -1,7 +1,0 @@
-echo ".venv/" >> .gitignore
-echo "__pycache__/" >> .gitignore
-echo "*.log" >> .gitignore
-echo "chromedriver" >> .gitignore
-echo "data_sentiment/" >> .gitignore   # On ignore les CSV en local
-# created by virtualenv automatically
-# *
