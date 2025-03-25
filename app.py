@@ -69,6 +69,7 @@ with col1:
         hole=0.6,
         marker=dict(colors=["#00c49f", "#ff004d"]),
         textinfo="label+percent",
+        textcolor='white',
         insidetextorientation='auto',
         hoverinfo="label+percent"
     )])
