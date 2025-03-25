@@ -42,6 +42,8 @@ if not pairs:
 
 selected_pair = st.selectbox("Choisir une paire :", pairs)
 csv_url = f"https://raw.githubusercontent.com/leslypierre/dumb-money-index/main/data/{selected_pair}_sentiment.csv"
+print(csv_url)
+st.write("📎 URL utilisée :", csv_url)  # Debug temporaire
 
 try:
     df = pd.read_csv(csv_url)
