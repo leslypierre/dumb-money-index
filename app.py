@@ -125,6 +125,7 @@ with col2:
     ))
 
     fig.update_layout(
+        xaxis=dict(type='category'),  # ✅ obligatoire pour comportement "fixe"
         shapes=[
             dict(
                 type="line",
@@ -138,6 +139,8 @@ with col2:
             )
         ],
         barmode='relative',
+        bargap=0.05,  # 🧱 espace entre les barres (0 = collées)
+        bargroupgap=0,  # 👥 pas d'espace entre groupes
         plot_bgcolor="#0e1117",
         paper_bgcolor="#0e1117",
         font=dict(color='white'),
