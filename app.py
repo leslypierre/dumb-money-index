@@ -41,8 +41,6 @@ if not pairs:
 
 selected_pair = st.selectbox("Choisir une paire :", pairs)
 csv_url = f"https://raw.githubusercontent.com/leslypierre/dumb-money-index/main/data/{selected_pair}_sentiment.csv"
-print(csv_url)
-st.write("📎 URL utilisée :", csv_url)  # Debug temporaire
 
 try:
     df = pd.read_csv(csv_url)
@@ -68,18 +66,22 @@ with col1:
         values=[long_pct, short_pct],
         hole=0.6,
         marker=dict(colors=["#00c49f", "#ff004d"]),
-        textinfo='label+percent',
-        textfont=dict(color='white')  # ✅ texte blanc
+        textinfo='percent+label',
+        textposition='outside',
+        textfont=dict(color='white', size=12),
+        pull=[0, 0.05],
+        automargin=True                     # ✅ Pour forcer l'espace autour
     )])
 
     donut_fig.update_layout(
         showlegend=False,
-        width=200,  # ✅ diamètre ajusté
-        height=200,
-        margin=dict(t=10, b=10, l=10, r=10),
-        paper_bgcolor="#0e1117",  # même fond que le reste
+        width=250,
+        height=250,
+        margin=dict(t=30, b=30, l=30, r=30),  # ✅ Ajout de marges plus grandes
+        paper_bgcolor="#0e1117",
         plot_bgcolor="#0e1117"
     )
+
 
     st.markdown(f"""
     <h3>
@@ -92,7 +94,7 @@ with col1:
 
 # 📈 Bar Chart (avec ligne 0 et symétrie)
 with col2:
-    df_plot = df.tail(50).copy()
+    df_plot = df.tail(25).copy()
     df_plot["day"] = df_plot["timestamp"].str[:10]
     df_plot["time"] = df_plot["timestamp"].str[11:]
     df_plot["label"] = df_plot["day"] + " " + df_plot["time"]
@@ -166,16 +168,7 @@ with col2:
 
     st.plotly_chart(fig, use_container_width=True)
 
-# 🧾 Tableau de données
-st.subheader("Données récentes")
-st.dataframe(
-    df.tail(10).style.set_properties(**{
-        'font-size': '12px',
-        'text-align': 'center'
-    }),
-    height=200,
-    use_container_width=True
-)
+
 
 
 
