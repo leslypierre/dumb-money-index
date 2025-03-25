@@ -110,7 +110,7 @@ with col2:
         x=df_plot["label"],
         y=-df_plot["short_pct"],
         name="Short",
-        marker_color="#ff595e",
+        marker_color="#ff004d",
         hovertemplate="%{x}<br>%{y}% Short<extra></extra>"
     ))
 
