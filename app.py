@@ -67,7 +67,7 @@ with col1:
         labels=["Long", "Short"],
         values=[long_pct, short_pct],
         hole=0.6,
-        marker=dict(colors=["#00c49f", "#ff595e"]),
+        marker=dict(colors=["#00c49f", "#ff004d"]),
         textinfo='label+percent',
         textfont=dict(color='white')  # ✅ texte blanc
     )])
