@@ -16,7 +16,7 @@ plt.rcParams['axes.labelcolor'] = 'white'
 plt.rcParams['legend.labelcolor'] = 'white'
 
 # 📁 Dossier où sont stockés les CSV
-DATA_DIR = "data"
+DATA_DIR = "data_sentiment"
 
 # 🖥️ Setup Streamlit
 st.set_page_config(page_title="Dumb Money Index [DXM]", layout="wide")
@@ -40,10 +40,10 @@ if not pairs:
     st.stop()
 
 selected_pair = st.selectbox("Choisir une paire :", pairs)
-csv_url = f"https://raw.githubusercontent.com/leslypierre/dumb-money-index/main/data/{selected_pair}_sentiment.csv"
+csv_path = os.path.join(DATA_DIR, f"{selected_pair}_sentiment.csv")
 
 try:
-    df = pd.read_csv(csv_url)
+    df = pd.read_csv(csv_path)
 except FileNotFoundError:
     st.warning("Aucune donnée trouvée pour cette paire.")
     st.stop()
@@ -54,10 +54,12 @@ long_pct = latest["long_pct"].values[0]
 short_pct = latest["short_pct"].values[0]
 
 # ℹ️ Info date dernière mise à jour
-st.caption(f"📅 Dernière mise à jour : {latest['timestamp'].values[0]}")
+last_update = pd.to_datetime(latest["timestamp"].values[0])
+formatted_update = last_update.strftime("%Y-%m-%d %H:%M")
+st.caption(f"📅 Dernière mise à jour : {formatted_update}")
 
 # 📊 Display graphique
-col1, col2 = st.columns([1, 2])
+col1, col2, col3, col4 = st.columns([1.8, 2, 2, 2])
 
 # 🍩 Donut Chart
 with col1:
@@ -84,7 +86,7 @@ with col1:
 
 
     st.markdown(f"""
-    <h3>
+    <h3  style='font-size:18px;'>
         <span style='color: white;'>DMX </span>
         <span style='color: orange;'>[{selected_pair} — Percentage Chart]</span>
     </h3>
@@ -97,7 +99,7 @@ with col2:
     df_plot = df.tail(25).copy()
     df_plot["day"] = df_plot["timestamp"].str[:10]
     df_plot["time"] = df_plot["timestamp"].str[11:]
-    df_plot["label"] = df_plot["day"] + " " + df_plot["time"]
+    df_plot["label"] = df_plot["timestamp"].str[11:16]  # HH:MM
 
     df_plot["long_pct"] = df_plot["long_pct"].clip(upper=100)
     df_plot["short_pct"] = df_plot["short_pct"].clip(upper=100)
@@ -152,15 +154,11 @@ with col2:
         font=dict(color='white'),
         margin=dict(l=10, r=10, t=30, b=60),
         height=300,
-        legend=dict(
-            bgcolor="#1a1c23",
-            bordercolor="white",
-            borderwidth=1
-        )
+        showlegend=False
     )
 
     st.markdown(f"""
-    <h3>
+    <h3  style='font-size:18px;'>
         <span style='color: white;'>DMX </span>
         <span style='color: orange;'>[{selected_pair} — Bar Chart (1h)]</span>
     </h3>
@@ -168,8 +166,89 @@ with col2:
 
     st.plotly_chart(fig, use_container_width=True)
 
+with col3:
+    lots_plot = df.tail(25).copy()
+    lots_plot["label"] = lots_plot["timestamp"].str[5:16]  # format "MM-DD HH:MM"
 
+    fig_lots = go.Figure()
+    fig_lots.add_trace(go.Scatter(
+        x=lots_plot["label"],
+        y=lots_plot["long_lots"],
+        mode="lines+markers",
+        name="Long",
+        line=dict(color="#00c49f"),
+        fill='tozeroy',
+        hovertemplate="%{x}<br>%{y} Lots Long<extra></extra>"
+    ))
 
+    fig_lots.add_trace(go.Scatter(
+        x=lots_plot["label"],
+        y=lots_plot["short_lots"],
+        mode="lines+markers",
+        name="Short",
+        line=dict(color="#ff004d"),
+        fill='tozeroy',
+        hovertemplate="%{x}<br>%{y} Lots Short<extra></extra>"
+    ))
 
+    fig_lots.update_layout(
+        paper_bgcolor="#0e1117",
+        plot_bgcolor="#0e1117",
+        font=dict(color='white'),
+        margin=dict(t=40, b=40, l=20, r=20),
+        height=300,
+        showlegend=True,
+        legend=dict(orientation="h", y=1.1, x=0)
+    )
 
+    st.markdown(f"""
+        <h3  style='font-size:18px;'>
+            <span style='color: white;'>DMX </span>
+            <span style='color: orange;'>[{selected_pair} — Lots Chart]</span>
+        </h3>
+        """, unsafe_allow_html=True)
+    st.plotly_chart(fig_lots, use_container_width=True)
+
+with col4:
+    pos_plot = df.tail(25).copy()
+    pos_plot["label"] = pos_plot["timestamp"].str[5:16]
+
+    fig_pos = go.Figure()
+    fig_pos.add_trace(go.Scatter(
+        x=pos_plot["label"],
+        y=pos_plot["long_pos"],
+        mode="lines+markers",
+        name="Long",
+        line=dict(color="#00c49f"),
+        fill='tozeroy',
+        hovertemplate="%{x}<br>%{y} Positions Long<extra></extra>"
+    ))
+
+    fig_pos.add_trace(go.Scatter(
+        x=pos_plot["label"],
+        y=pos_plot["short_pos"],
+        mode="lines+markers",
+        name="Short",
+        line=dict(color="#ff004d"),
+        fill='tozeroy',
+        hovertemplate="%{x}<br>%{y} Positions Short<extra></extra>"
+    ))
+
+    fig_pos.update_layout(
+        paper_bgcolor="#0e1117",
+        plot_bgcolor="#0e1117",
+        font=dict(color='white'),
+        margin=dict(t=40, b=40, l=20, r=20),
+        height=300,
+        showlegend=True,
+        legend=dict(orientation="h", y=1.1, x=0)
+    )
+
+    st.markdown(f"""
+        <h3  style='font-size:18px;'>
+            <span style='color: white;'>DMX </span>
+            <span style='color: orange;'>[{selected_pair} — Positions Chart]</span>
+        </h3>
+        """, unsafe_allow_html=True)
+    st.plotly_chart(fig_pos, use_container_width=True)
 

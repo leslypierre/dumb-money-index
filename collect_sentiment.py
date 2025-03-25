@@ -1,86 +1,109 @@
-# collect_sentiment.py (version log + compteur)
-
-import requests
-from bs4 import BeautifulSoup
+from datetime import datetime, timezone
+import time
 import pandas as pd
-from datetime import datetime
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
 import os
 
-MAJORS = ["EUR", "GBP", "USD", "AUD", "NZD", "CAD", "CHF", "JPY"]
-ALLOWED_PAIRS = [a + b for a in MAJORS for b in MAJORS if a != b]
-DATA_DIR = "data"
+PAIRS = [
+    "AUDCAD", "AUDCHF", "AUDJPY", "AUDNZD", "AUDUSD",
+    "CADCHF", "CADJPY", "CHFJPY",
+    "EURAUD", "EURCAD", "EURCHF", "EURGBP", "EURJPY", "EURNZD", "EURUSD",
+    "GBPAUD", "GBPCAD", "GBPCHF", "GBPJPY", "GBPNZD", "GBPUSD",
+    "NZDCAD", "NZDCHF", "NZDJPY", "NZDUSD",
+    "USDCAD", "USDCHF", "USDJPY"
+]
 
-def get_sentiment_from_myfxbook():
-    url = "https://www.myfxbook.com/community/outlook"
-    headers = {"User-Agent": "Mozilla/5.0"}
-    response = requests.get(url, headers=headers)
-    soup = BeautifulSoup(response.text, 'html.parser')
-    table = soup.find("table", {"id": "outlookSymbolsTable"})
-    rows = table.find("tbody").find_all("tr")
+def parse_lots(value):
+    return float(value.replace("lots", "").replace(",", "").strip())
 
-    data = []
-    for row in rows:
-        try:
-            cols = row.find_all("td")
-            if not cols or len(cols) < 2:
+def parse_pct(value):
+    return float(value.replace("%", "").strip())
+
+def parse_int(value):
+    return int(value.replace(",", "").strip())
+
+def get_sentiment_data(pair):
+    url = f"https://www.myfxbook.com/community/outlook/{pair}"
+    print(f"🔄 Récupération {pair}...")
+
+    options = Options()
+    options.add_argument("--headless=new")
+    driver = webdriver.Chrome(options=options)
+    driver.get(url)
+    time.sleep(8)
+
+    try:
+        table = driver.find_element(By.ID, "currentMetricsTable")
+        rows = table.find_elements(By.TAG_NAME, "tr")
+        data_rows = [r.find_elements(By.TAG_NAME, "td") for r in rows]
+        parsed_rows = [[cell.text for cell in row] for row in data_rows if row]
+
+        print(f"   ▶️ {pair} : {len(parsed_rows)} lignes trouvées")
+        for i, row in enumerate(parsed_rows):
+            print(f"      Ligne {i} : {row}")
+
+        short_row = next((r for r in parsed_rows if "Short" in r[0]), None)
+        long_row = next((r for r in parsed_rows if "Long" in r[0]), None)
+
+        if not short_row or not long_row:
+            raise ValueError("Données Short/Long non trouvées")
+
+        short_pct = parse_pct(short_row[1])
+        short_lots = parse_lots(short_row[2])
+        short_pos = parse_int(short_row[3])
+
+        long_pct = parse_pct(long_row[1])
+        long_lots = parse_lots(long_row[2])
+        long_pos = parse_int(long_row[3])
+
+        timestamp = datetime.now(timezone.utc)
+
+        df = pd.DataFrame([{
+            "timestamp": timestamp,
+            "pair": pair,
+            "short_pct": short_pct,
+            "short_lots": short_lots,
+            "short_pos": short_pos,
+            "long_pct": long_pct,
+            "long_lots": long_lots,
+            "long_pos": long_pos
+        }])
+
+        return df
+
+    except Exception as e:
+        print(f"❌ Erreur {pair} : {e}")
+        return None
+
+    finally:
+        driver.quit()
+
+output_dir = "data_sentiment"
+os.makedirs(output_dir, exist_ok=True)
+
+for pair in PAIRS:
+    df_new = get_sentiment_data(pair)
+    if df_new is not None:
+        csv_path = os.path.join(output_dir, f"{pair}_sentiment.csv")
+        if os.path.exists(csv_path):
+            df_existing = pd.read_csv(csv_path)
+            df_existing["timestamp"] = pd.to_datetime(df_existing["timestamp"])
+
+            latest_timestamp = df_existing["timestamp"].max()
+            now = datetime.now(timezone.utc)
+
+            delta = now - latest_timestamp
+            if delta.total_seconds() < 3600:
+                print(f"⏩ {pair} : dernière entrée trop récente ({int(delta.total_seconds()/60)} min). Ignoré.")
                 continue
 
-            pair = cols[0].text.strip().replace("/", "")
-            if pair not in ALLOWED_PAIRS:
-                continue
+            df_all = pd.concat([df_existing, df_new], ignore_index=True)
+        else:
+            df_all = df_new
 
-            short_div = row.find("div", class_="progress-bar-danger")
-            long_div = row.find("div", class_="progress-bar-success")
+        df_all.to_csv(csv_path, index=False)
+        print(f"✅ Enregistré : {csv_path}")
 
-            short_pct = float(short_div["style"].split("width:")[1].replace("%;", "").strip())
-            long_pct = float(long_div["style"].split("width:")[1].replace("%;", "").strip())
-
-            data.append({
-                "pair": pair,
-                "long_pct": long_pct,
-                "short_pct": short_pct
-            })
-        except:
-            continue
-
-    return data
-
-def save_data_to_csv(data):
-    now = datetime.now().replace(minute=0, second=0, microsecond=0)
-    now_str = now.strftime("%Y-%m-%d %H:%M")
-    os.makedirs(DATA_DIR, exist_ok=True)
-
-    new_entries = 0
-
-    for item in data:
-        pair = item["pair"]
-        file_path = os.path.join(DATA_DIR, f"{pair}_sentiment.csv")
-
-        try:
-            df = pd.read_csv(file_path)
-        except FileNotFoundError:
-            df = pd.DataFrame(columns=["timestamp", "pair", "long_pct", "short_pct"])
-
-        already_exists = ((df["timestamp"] == now_str) & (df["pair"] == pair)).any()
-
-        if not already_exists:
-            new_row = pd.DataFrame([{
-                "timestamp": now_str,
-                "pair": pair,
-                "long_pct": item["long_pct"],
-                "short_pct": item["short_pct"]
-            }])
-            df = pd.concat([df, new_row], ignore_index=True)
-            df.to_csv(file_path, index=False)
-            new_entries += 1
-
-    print(f"✅ {new_entries} nouvelles lignes ajoutées.")
-    if new_entries == 0:
-        print("ℹ️ Aucune nouvelle donnée à enregistrer. Tout est déjà à jour.")
-
-if __name__ == "__main__":
-    print("⏳ Scraping MyFXBook...")
-    sentiment_data = get_sentiment_from_myfxbook()
-    save_data_to_csv(sentiment_data)
-    print("✅ Script terminé.")
-
+print("\n🎉 Fini ! Toutes les paires ont été mises à jour.")
