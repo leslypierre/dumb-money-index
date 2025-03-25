@@ -117,10 +117,10 @@ with col2:
     # Longs en positif
     fig.add_trace(go.Bar(
         x=df_plot["label"],
-        y=-df_plot["short_pct"],
-        name="Short",
-        marker_color="#ff595e",
-        hovertemplate="%{x}<br>%{y}% Short<extra></extra>",
+        y=df_plot["long_pct"],
+        name="Long",
+        marker_color="#00c49f",
+        hovertemplate="%{x}<br>%{y}% Long<extra></extra>",
         width=0.5
     ))
 
