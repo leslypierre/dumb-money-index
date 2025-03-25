@@ -121,7 +121,6 @@ with col2:
         name="Long",
         marker_color="#00c49f",
         hovertemplate="%{x}<br>%{y}% Long<extra></extra>",
-        width=0.5
     ))
 
     fig.update_layout(
