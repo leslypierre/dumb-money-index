@@ -1,0 +1,23 @@
+# 📦 Environnement virtuel
+.venv/
+env/
+venv/
+
+# 🐍 Python cache & build
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.log
+
+# 📂 Dossiers de données locales
+data/
+data_sentiment/
+
+# 🧪 Tests / notebooks / temporaires
+*.ipynb_checkpoints
+.DS_Store
+*.tmp
+
+# 🧩 ChromeDriver / binaires
+chromedriver

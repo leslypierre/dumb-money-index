@@ -23,7 +23,7 @@ jobs:
 
       # 3. 📦 Installer les dépendances
       - name: 📦 Installer les dépendances
-        run: pip install requests beautifulsoup4 pandas
+        run: pip install pandas selenium
 
       # 4. 🚀 Lancer le script Python
       - name: 🚀 Lancer le script
@@ -34,7 +34,7 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git add data/*.csv
+          git add data_sentiment/*.csv
 
           # Ajoute un timestamp dans le message
           TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M UTC")
