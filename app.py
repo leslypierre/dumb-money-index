@@ -158,7 +158,7 @@ with col2:
     st.markdown(f"""
     <h3  style='font-size:18px;'>
         <span style='color: white;'>DMX </span>
-        <span style='color: orange;'>[{selected_pair} — Bar Chart (1h)]</span>
+        <span style='color: orange;'>[{selected_pair} — Bar Chart (4h)]</span>
     </h3>
     """, unsafe_allow_html=True)
 
