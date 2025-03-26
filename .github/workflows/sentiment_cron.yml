@@ -32,12 +32,12 @@ jobs:
       # 5. ✅ Commit des CSV modifiés (si besoin)
       - name: 📤 Commit des nouveaux CSV
         run: |
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-          git pull --rebase
-          git add data_sentiment/*.csv
-
-          # Ajoute un timestamp dans le message
-          TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M UTC")
-          git commit -m "📈 Update sentiment data — $TIMESTAMP" || echo "ℹ️ Rien à commit"
-          git push
+            git config user.name "github-actions"
+            git config user.email "actions@github.com"
+            
+            git add data_sentiment/*.csv
+            TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M UTC")
+            git commit -m "📈 Update sentiment data — $TIMESTAMP" || echo "ℹ️ Rien à commit"
+            
+            git pull --rebase
+            git push
