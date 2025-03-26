@@ -90,15 +90,6 @@ for pair in PAIRS:
         if os.path.exists(csv_path):
             df_existing = pd.read_csv(csv_path)
             df_existing["timestamp"] = pd.to_datetime(df_existing["timestamp"])
-
-            latest_timestamp = df_existing["timestamp"].max()
-            now = datetime.now(timezone.utc)
-
-            delta = now - latest_timestamp
-            if delta.total_seconds() < 3600:
-                print(f"⏩ {pair} : dernière entrée trop récente ({int(delta.total_seconds()/60)} min). Ignoré.")
-                continue
-
             df_all = pd.concat([df_existing, df_new], ignore_index=True)
         else:
             df_all = df_new
