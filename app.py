@@ -98,7 +98,7 @@ with tab_main :
 
     # 📈 Bar Chart (avec ligne 0 et symétrie)
     with col2:
-        df_plot = df.tail(25).copy()
+        df_plot = df.tail(50).copy()
         df_plot["day"] = df_plot["timestamp"].str[:10]
         df_plot["time"] = df_plot["timestamp"].str[11:]
         df_plot["label"] = pd.to_datetime(df_plot["timestamp"]).dt.strftime("%m-%d %H:%M")
@@ -132,8 +132,8 @@ with tab_main :
             xaxis=dict(
                 type='category',  # Obligatoire pour traiter les labels comme des catégories
                 tickmode='array',
-                tickvals=df_plot["label"][::4],
-                ticktext=df_plot["label"][::4],
+                tickvals=df_plot["label"][::6],
+                ticktext=df_plot["label"][::6],
                 tickangle=45  # Incline un peu pour éviter chevauchement
             ),
             shapes=[
@@ -169,7 +169,7 @@ with tab_main :
         st.plotly_chart(fig, use_container_width=True)
 
     with col3:
-        lots_plot = df.tail(25).copy()
+        lots_plot = df.tail(50).copy()
         lots_plot["label"] = lots_plot["timestamp"].str[5:16]  # format "MM-DD HH:MM"
 
         fig_lots = go.Figure()
@@ -197,8 +197,8 @@ with tab_main :
             xaxis=dict(
                 type='category',
                 tickmode='array',
-                tickvals=lots_plot["label"][::4],
-                ticktext=lots_plot["label"][::4],
+                tickvals=lots_plot["label"][::6],
+                ticktext=lots_plot["label"][::6],
                 tickangle=45
             ),
             paper_bgcolor="#0e1117",
@@ -219,7 +219,7 @@ with tab_main :
         st.plotly_chart(fig_lots, use_container_width=True)
 
     with col4:
-        pos_plot = df.tail(25).copy()
+        pos_plot = df.tail(50).copy()
         pos_plot["label"] = pos_plot["timestamp"].str[5:16]
 
         fig_pos = go.Figure()
@@ -247,8 +247,8 @@ with tab_main :
             xaxis=dict(
                 type='category',
                 tickmode='array',
-                tickvals=pos_plot["label"][::4],
-                ticktext=pos_plot["label"][::4],
+                tickvals=pos_plot["label"][::6],
+                ticktext=pos_plot["label"][::6],
                 tickangle=45
             ),
             paper_bgcolor="#0e1117",
@@ -267,9 +267,3 @@ with tab_main :
             </h3>
             """, unsafe_allow_html=True)
         st.plotly_chart(fig_pos, use_container_width=True)
-
-
-
-
-
-
