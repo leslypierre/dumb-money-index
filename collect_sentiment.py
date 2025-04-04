@@ -6,6 +6,19 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 import os
 
+# 🔒 Stop script si marché fermé
+now = datetime.now(timezone.utc)
+
+if now.weekday() == 5 or now.weekday() == 6:
+    print("⏸️ Marché fermé (weekend) — pas de collecte.")
+    exit()
+
+if now.weekday() == 4 and now.hour >= 22:
+    print("⏸️ Marché fermé (vendredi soir) — pas de collecte.")
+    exit()
+
+print("✅ Marché ouvert — on continue.")
+
 PAIRS = [
     "AUDCAD", "AUDCHF", "AUDJPY", "AUDNZD", "AUDUSD",
     "CADCHF", "CADJPY", "CHFJPY",
