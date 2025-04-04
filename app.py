@@ -132,8 +132,8 @@ with tab_main :
             xaxis=dict(
                 type='category',  # Obligatoire pour traiter les labels comme des catégories
                 tickmode='array',
-                tickvals=df_plot["label"][::6],
-                ticktext=df_plot["label"][::6],
+                tickvals=df_plot["label"][::10],
+                ticktext=df_plot["label"][::10],
                 tickangle=45  # Incline un peu pour éviter chevauchement
             ),
             shapes=[
@@ -197,8 +197,8 @@ with tab_main :
             xaxis=dict(
                 type='category',
                 tickmode='array',
-                tickvals=lots_plot["label"][::6],
-                ticktext=lots_plot["label"][::6],
+                tickvals=lots_plot["label"][::10],
+                ticktext=lots_plot["label"][::10],
                 tickangle=45
             ),
             paper_bgcolor="#0e1117",
@@ -247,8 +247,8 @@ with tab_main :
             xaxis=dict(
                 type='category',
                 tickmode='array',
-                tickvals=pos_plot["label"][::6],
-                ticktext=pos_plot["label"][::6],
+                tickvals=pos_plot["label"][::10],
+                ticktext=pos_plot["label"][::10],
                 tickangle=45
             ),
             paper_bgcolor="#0e1117",
