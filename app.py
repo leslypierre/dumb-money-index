@@ -21,7 +21,7 @@ DATA_DIR = "data_sentiment"
 st.set_page_config(page_title="Terminal", layout="wide")
 
 # 🗂️ Onglets principaux
-tab_main, tab_secondary = st.tabs(["DMX", "Economic calendar"])
+tab_main, tab_secondary = st.tabs(["DMX", "Interest rates"])
 
 PAIRS = [
     "AUDCAD", "AUDCHF", "AUDJPY", "AUDNZD", "AUDUSD",
