@@ -18,7 +18,7 @@ plt.rcParams['legend.labelcolor'] = 'white'
 # 📁 Dossier où sont stockés les CSV
 DATA_DIR = "data_sentiment"
 
-st.set_page_config(page_title="[DXM]", layout="wide")
+st.set_page_config(page_title="Terminal", layout="wide")
 
 # 🗂️ Onglets principaux
 tab_main, tab_secondary = st.tabs(["DMX", "Economic calendar"])
@@ -101,7 +101,7 @@ with tab_main :
         df_plot = df.tail(25).copy()
         df_plot["day"] = df_plot["timestamp"].str[:10]
         df_plot["time"] = df_plot["timestamp"].str[11:]
-        df_plot["label"] = df_plot["timestamp"].str[11:16]  # HH:MM
+        df_plot["label"] = pd.to_datetime(df_plot["timestamp"]).dt.strftime("%m-%d %H:%M")
 
         df_plot["long_pct"] = df_plot["long_pct"].clip(upper=100)
         df_plot["short_pct"] = df_plot["short_pct"].clip(upper=100)
@@ -132,8 +132,8 @@ with tab_main :
             xaxis=dict(
                 type='category',  # Obligatoire pour traiter les labels comme des catégories
                 tickmode='array',
-                tickvals=df_plot["label"],
-                ticktext=df_plot["label"],
+                tickvals=df_plot["label"][::4],
+                ticktext=df_plot["label"][::4],
                 tickangle=45  # Incline un peu pour éviter chevauchement
             ),
             shapes=[
@@ -160,11 +160,11 @@ with tab_main :
         )
 
         st.markdown(f"""
-        <h3  style='font-size:18px;'>
-            <span style='color: white;'>DMX </span>
-            <span style='color: orange;'>[{selected_pair} — Bar Chart (4h)]</span>
-        </h3>
-        """, unsafe_allow_html=True)
+                <h3  style='font-size:18px;'>
+                    <span style='color: white;'>DMX </span>
+                    <span style='color: orange;'>[{selected_pair} — Bar Chart (4h)]</span>
+                </h3>
+                """, unsafe_allow_html=True)
 
         st.plotly_chart(fig, use_container_width=True)
 
@@ -194,6 +194,13 @@ with tab_main :
         ))
 
         fig_lots.update_layout(
+            xaxis=dict(
+                type='category',
+                tickmode='array',
+                tickvals=lots_plot["label"][::4],
+                ticktext=lots_plot["label"][::4],
+                tickangle=45
+            ),
             paper_bgcolor="#0e1117",
             plot_bgcolor="#0e1117",
             font=dict(color='white'),
@@ -237,6 +244,13 @@ with tab_main :
         ))
 
         fig_pos.update_layout(
+            xaxis=dict(
+                type='category',
+                tickmode='array',
+                tickvals=pos_plot["label"][::4],
+                ticktext=pos_plot["label"][::4],
+                tickangle=45
+            ),
             paper_bgcolor="#0e1117",
             plot_bgcolor="#0e1117",
             font=dict(color='white'),
@@ -254,10 +268,8 @@ with tab_main :
             """, unsafe_allow_html=True)
         st.plotly_chart(fig_pos, use_container_width=True)
 
-with tab_secondary:
-    st.markdown("""
-        <h1 style='text-align: center;'>
-            <span style='color: white;'>Economic calendar</span>
-        </h1>
-        """, unsafe_allow_html=True)
+
+
+
+
 
